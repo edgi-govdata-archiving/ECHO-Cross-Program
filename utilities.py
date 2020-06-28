@@ -203,7 +203,7 @@ def get_program_data( program, echo_data ):
         tri_registry_ids = echo_data[echo_data['TRI_FLAG'] == 'Y'].index.values
         id_set = np.union1d( ghg_registry_ids, tri_registry_ids )
         registry_ids = list(id_set)
-        breakpoint()
+        # breakpoint()
         program_data = program.get_data( ee_ids=registry_ids )
         key = { i : i for i in registry_ids }
     elif ( program.name == "Greenhouse Gases" or program.name == "Toxic Releases" ):
@@ -369,34 +369,35 @@ def show_chart( program, region, data, state=None, fac_name=None ):
 
 
 # Put some information with the marker to show the programs that track the facility.
-def marker_text( row ):
+def marker_text( row, is_echo ):
     text = ""
     if ( type( row['FAC_NAME'] == str )) :
         try:
             text = row["FAC_NAME"] + ' - '
         except TypeError:
             print( "A facility was found without name. ")
-        if ( row['AIR_FLAG'] == 'Y' ):
-            text += 'CAA, ' 
-        if ( row['NPDES_FLAG'] == 'Y' ):
-            text += 'CWA, ' 
-        if ( row['SDWIS_FLAG'] == 'Y' ):
-            text += 'SDWIS, ' 
-        if ( row['RCRA_FLAG'] == 'Y' ):
-            text += 'RCRA, ' 
-        if ( row['TRI_FLAG'] == 'Y' ):
-            text += 'TRI, ' 
-        if ( row['GHG_FLAG'] == 'Y' ):
-            text += 'GHG, ' 
-        text = text[:-1]
-        text += " - <p><a href='"+row["DFR_URL"]
-        text += "' target='_blank'>Link to ECHO detailed report</a></p>"
+        if ( is_echo ):
+            if ( row['AIR_FLAG'] == 'Y' ):
+                text += 'CAA, ' 
+            if ( row['NPDES_FLAG'] == 'Y' ):
+                text += 'CWA, ' 
+            if ( row['SDWIS_FLAG'] == 'Y' ):
+                text += 'SDWIS, ' 
+            if ( row['RCRA_FLAG'] == 'Y' ):
+                text += 'RCRA, ' 
+            if ( row['TRI_FLAG'] == 'Y' ):
+                text += 'TRI, ' 
+            if ( row['GHG_FLAG'] == 'Y' ):
+                text += 'GHG, ' 
+            text = text[:-1]
+            text += " - <p><a href='"+row["DFR_URL"]
+            text += "' target='_blank'>Link to ECHO detailed report</a></p>"
     return text
 
 
 # Helps us make the map!
 # Based on https://medium.com/@bobhaffner/folium-markerclusters-and-fastmarkerclusters-1e03b01cb7b1
-def mapper(df):
+def mapper(df, is_echo=True):
     # Initialize the map
     m = folium.Map(
         location = [df.mean()["FAC_LAT"], df.mean()["FAC_LONG"]]
@@ -410,7 +411,7 @@ def mapper(df):
     for index, row in df.iterrows():
         mc.add_child(folium.CircleMarker(
             location = [row["FAC_LAT"], row["FAC_LONG"]],
-            popup = marker_text( row ),
+            popup = marker_text( row, is_echo ),
             radius = 8,
             color = "black",
             weight = 1,
