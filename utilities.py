@@ -90,14 +90,6 @@ def show_pick_region_widget( type, state_widget=None ):
             print( "You must first choose a state." )
             return
         my_state = state_widget.value
-        region_sql = "select distinct("
-        region_sql += selected_region_field[ 'field' ] + ")"
-        region_sql += " from ECHO_EXPORTER "
-        region_sql += " where FAC_STATE = \'" + my_state + "\'"
-        try:
-            regions = get_data( region_sql )
-        except pd.errors.EmptyDataError:
-            print("\nThere are no regions of that type in this state.\n")
     
     if ( type == 'Zip Code' ):
         region_widget = widgets.IntText(
@@ -106,14 +98,18 @@ def show_pick_region_widget( type, state_widget=None ):
             disabled=False
         )
     elif ( type == 'County' ):
+        df = pd.read_csv( 'ECHO_modules/state_counties.csv' )
+        counties = df[df['FAC_STATE'] == my_state]['FAC_COUNTY']
         region_widget=widgets.Dropdown(
-            options=fix_county_names( regions['FAC_COUNTY'] ),
+            options=fix_county_names( counties ),
             description='County:',
             disabled=False
         )
     elif ( type == 'Congressional District' ):
+        df = pd.read_csv( 'ECHO_modules/state_cd.csv' )
+        cds = df[df['FAC_STATE'] == my_state]['FAC_DERIVED_CD113']
         region_widget=widgets.Dropdown(
-            options=regions['FAC_DERIVED_CD113'].sort_values(),
+            options=cds.to_list(),
             description='District:',
             disabled=False
         )
