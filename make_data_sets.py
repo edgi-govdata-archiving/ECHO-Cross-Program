@@ -8,7 +8,7 @@
 # In the following line, 'from DataSet' refers to the file DataSet.py
 # while 'import DataSet' refers to the DataSet class within DataSet.py.
 
-from DataSet import DataSet
+from ECHO_modules.DataSet import DataSet
 
 def make_data_sets():
     data_sets = {}
