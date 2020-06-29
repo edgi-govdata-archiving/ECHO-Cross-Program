@@ -344,14 +344,18 @@ def get_program_data( program, echo_data ):
     
     # Find the facility that matches the program data, by REGISTRY_ID.  
     # Add lat and lon, facility name and REGISTRY_ID as fac_registry_id. 
-    # (Note: not adding REGISTRY_ID right now as it is sometimes interpreted as an int and that messes with the charts...)
+    # (Note: not adding REGISTRY_ID right now as it is sometimes interpreted 
+    # as an int and that messes with the charts...)
     my_prog_data = pd.DataFrame()
     no_data_ids = []
     
-    # Look through all the facilities in my area and program and get supplemental echo_data info
+    # Look through all the facilities in my area and program and get supplemental 
+    # echo_data info
     if (program_data is None): # Handle no data
-        print("Sorry, we don't have data for this program! That could be an error on our part, or ECHO's, or because the data type doesn't apply to this area.")
+        print("Sorry, we don't have data for this program! That could be an error" \
+            " on our part, or ECHO's, or because the data type doesn't apply to this area.")
     else:
+        # breakpoint()
         for fac in program_data.itertuples():
             fac_id = fac.Index
             try:
