@@ -7,7 +7,7 @@ import folium
 from folium.plugins import FastMarkerCluster
 import ipywidgets as widgets
 from ipywidgets import interact, interactive, fixed, interact_manual, Layout
-from DataSet import get_data
+from ECHO_modules.DataSet import get_data
 
 from IPython.display import display
 
@@ -44,9 +44,18 @@ region_field = {
     'Zip Code': { "field": 'FAC_DERIVED_ZIP' }
 }
 
-    
+
+#####################
+#  fix_county_names( in_counties )
+#    
 # ECHO_EXPORTER has counties listed both as ALAMEDA and ALAMEDA COUNTY, seemingly
 # for every county.  We drop the 'COUNTY' so they only get listed once.
+#
+# Parameters:  in_counties -- list of county names
+# Return: The new list of counties without duplicates
+#
+#####################
+
 def fix_county_names( in_counties ):
     counties = []
     for county in in_counties:
@@ -56,6 +65,15 @@ def fix_county_names( in_counties ):
     counties = np.unique( counties )
     return counties
 
+
+#####################
+#  show_region_type_widget()
+#    
+# Create and return a dropdown list of types of regions.
+#
+# Return: The widget 
+#
+#####################
 
 def show_region_type_widget():
     style = {'description_width': 'initial'}
@@ -70,6 +88,15 @@ def show_region_type_widget():
     return select_region_widget
 
 
+#####################
+#  show_state_widget()
+#    
+# Create and return a dropdown list of states
+#
+# Return: The widget 
+#
+#####################
+
 def show_state_widget():
     dropdown_state=widgets.Dropdown(
         options=states,
@@ -82,8 +109,23 @@ def show_state_widget():
     return dropdown_state
 
 
+#####################
+# show_pick_region_widget( type, state_widget=None ):
+#    
+# Create and return a dropdown list of regions appropriate
+# to the input parameters
+#
+# Parameters:
+#    type -- The type of region
+#    state_widget -- The widget in which a state may have been selected.
+#
+# Return: The widget or None 
+#
+#####################
+
 def show_pick_region_widget( type, state_widget=None ):
     selected_region_field = region_field[ type ]
+    region_widget = None
     
     if ( type != 'Zip Code' ):
         if ( state_widget is None ):
@@ -113,8 +155,25 @@ def show_pick_region_widget( type, state_widget=None ):
             description='District:',
             disabled=False
         )
-    display( region_widget )
+    if ( region_widget is not None ):
+        display( region_widget )
     return region_widget
+
+
+#####################
+# show_data_set_widget( data_sets, echo_data ):
+#    
+# Create and return a dropdown list of data sets with appropriate
+# flags set in the echo_data. 
+#
+# Parameters:
+#    data_sets -- The Dictionary of data sets. Values are instances
+#        of class DataSet.
+#    echo_data -- The ECHO_EXPORTER data with flags for program types
+#
+# Return: The widget of data set choices
+#
+#####################
 
 def show_data_set_widget( data_sets, echo_data ):
     # Only list the data set if it has the correct flag set.
@@ -133,6 +192,20 @@ def show_data_set_widget( data_sets, echo_data ):
     display(data_set_widget)
     return data_set_widget
 
+
+#####################
+#  show_fac_widget( fac_series ):
+#    
+# Create and return a dropdown list of facilities from the Series
+#
+# Parameters:
+#    fac_series -- A Series containing the facilities to be shown.
+#        It may have duplicates
+#
+# Return: The widget of facility names
+#
+#####################
+
 def show_fac_widget( fac_series ):
     fac_list = fac_series.dropna().unique()
     fac_list.sort()
@@ -146,6 +219,21 @@ def show_fac_widget( fac_series ):
     )
     display(widget)
     return widget
+
+
+#####################
+#  show_fac_pgm_widget( fac_data, data_sets ):
+#    
+# Create and return a dropdown list of program data sets associated
+# with the facility (ECHO_EXPORTER) data.
+#
+# Parameters:
+#    fac_data -- A DataFrame of ECHO_EXPORTER facilities
+#    data_sets -- The Dictionary of DataSet instances
+#
+# Return: The widget with associated data sets
+#
+#####################
 
 def show_fac_pgm_widget( fac_data, data_sets ):
     data_set_choices = []
@@ -161,6 +249,20 @@ def show_fac_pgm_widget( fac_data, data_sets ):
     display(widget)
     return widget
 
+
+#####################
+#  get_echo_data( region_type, region_widget, state_widget = None ):
+#    
+# Query the database for ECHO_EXPORTER data appropriate to the parameters.
+#
+# Parameters:
+#    region_type -- The type of region
+#    region_widget -- The widget that will contain the region selected.
+#    state_widget -- The widget that will contain the state selected.
+#
+# Return: A DataFrame of the data retrieved.
+#
+#####################
 
 def get_echo_data( region_type, region_widget, state_widget = None ):
     if ( region_type == 'State'):
@@ -187,6 +289,22 @@ def get_echo_data( region_type, region_widget, state_widget = None ):
               %(echo_data.shape[0] ))
     return echo_data
 
+
+#####################
+#  get_program_data( program, echo_data ):
+#    
+# Based on the program requested, get the appropriate IDs from the echo_data.
+# Then use the program DataSet class to query the database for the set of
+# records by the ID list.
+#
+# Parameters:
+#    program -- An instance of class DataSet for a program
+#    echo_data -- The ECHO_EXPORTER facility records containing flags and
+#        IDs for programs associated with the facilities
+#
+# Return: A DataFrame containing the retrieved program data.
+#
+#####################
 
 def get_program_data( program, echo_data ):
     program_data = None
@@ -236,8 +354,8 @@ def get_program_data( program, echo_data ):
     else:
         for fac in program_data.itertuples():
             fac_id = fac.Index
-            reg_id = key[fac_id] # Look up this facility's Registry ID through its Program ID
             try:
+                reg_id = key[fac_id] # Look up this facility's Registry ID through its Program ID
                 echo_row = pd.DataFrame(echo_data.loc[reg_id].copy()).T.reset_index() # Find and filter to the corresponding row in ECHO_EXPORTER
                 echo_row = echo_row[['FAC_NAME', 'FAC_LAT', 'FAC_LONG']] # Keep only the columns we need
                 program_row =  pd.DataFrame([list(fac)[1:]], columns=program_data.columns.values) # Turn the program_data tuple into a DataFrame
@@ -250,69 +368,18 @@ def get_program_data( program, echo_data ):
     return my_prog_data
 
 
-def get_fac_pgm_data( fac_data, fac_program ):
-    ids = None
-    ids_string = None
-    if ( fac_program.idx_field != "REGISTRY_ID" ):
-        # This doesn't work for REGISTRY_ID, and we make our list differently 
-        # for programs that have that field as their index.
-        ids_string = fac_program.echo_type + '_IDS'
-        ids = fac_data.loc[fac_data[ids_string].str.len() >0]    # just give all _IDs and let sql deal with it?
-        ids = ids.loc[:,ids_string].unique()
-    
-    # We need to provide a custom sql query and argument for these programs.
-    if ( fac_program.name == "Air Inspections" or fac_program.name == "Air Enforcements" ):
-        # The REGISTRY_ID field is the index of the echo_data
-        # Build a string
-        registry_ids = fac_data[fac_data['AIR_FLAG'] == 'Y'].index.to_list()
-        # breakpoint()
-        this_data = fac_program.get_data( ee_ids=registry_ids )
-    elif ( fac_program.name == "Combined Air Emissions" ):
-        ghg_registry_ids = fac_data[fac_data['GHG_FLAG'] == 'Y'].index.to_list()
-        tri_registry_ids = fac_data[fac_data['TRI_FLAG'] == 'Y'].index.to_list()
-        id_set = set( ghg_registry_ids + tri_registry_ids )
-        this_data = fac_program.get_data( ee_ids=list(id_set) )
-    elif ( fac_program.name == "Greenhouse Gases" or fac_program.name == "Toxic Releases" ):
-        program_flag = fac_program.echo_type + '_FLAG'
-        registry_ids = fac_data[fac_data[ program_flag ] == 'Y'].index.to_list()
-        this_data = fac_program.get_data( ee_ids=registry_ids )
-    else:
-        this_data = fac_program.get_data( ee_ids=ids )
-    return this_data
-
-
-def add_fac_to_pgm_data( pgm_data, fac_data ):
-    # Find the facility that matches the program data, by REGISTRY_ID.  
-    # Add lat and lon, facility name and REGISTRY_ID as fac_registry_id.
-    # (The program data may alread have a REGISTRY_ID field.)
-
-    program_data = pd.DataFrame()
-    no_data_ids = []
-    
-    for fac in fac_data.itertuples():
-        break
-        
-    fac_id = fac.Index
-    breakpoint()
-    try:
-        program_rows = fac_data.loc[ fac_id ].copy()
-        n = program_rows.shape[0]
-        fac_list = [fac_id] * n
-        fac_names = [fac.FAC_NAME] * n
-        fac_lats = [fac.FAC_LAT] * n
-        fac_longs = [fac.FAC_LONG] * n
-        program_rows['fac_registry_id'] = fac_list
-        program_rows['FAC_NAME'] = fac_names
-        program_rows['FAC_LAT'] = fac_lats
-        program_rows['FAC_LONG'] = fac_longs
-        # breakpoint()
-        frames = [program_data, program_rows]
-        program_data = pd.concat( frames, ignore_index=False)
-    except KeyError:
-        # The facility wasn't found in the program data.
-        no_data_ids.append( fac.Index )
-    return program_data
-
+#####################
+#  show_chart( program, region, data, state=None, fac_name=None ):
+#    
+# Display a chart based on the parameters.
+#
+# Parameters:
+#    program -- A Dictionary entry with name and DataSet to be displayed
+#    region -- The region, for the chart's title
+#    state -- The state, for the chart's title
+#    fac_name -- The name of the facility, for the chart's title
+#
+#####################
 
 def show_chart( program, region, data, state=None, fac_name=None ):
     chart_title = program.name 
@@ -368,7 +435,20 @@ def show_chart( program, region, data, state=None, fac_name=None ):
             print("There's no data to chart for " + program.name + " !")
 
 
-# Put some information with the marker to show the programs that track the facility.
+#####################
+#  marker_text( row, is_echo ):
+#    
+# Create a string with information about the facility or program instance.
+#
+# Parameters:  
+#    row -- The row of data associated with the marker.
+#    is_echo -- If True, put some information with the marker to show the 
+#        programs that track the facility.
+#
+# Return:  The text to put with the marker
+#
+#####################
+
 def marker_text( row, is_echo ):
     text = ""
     if ( type( row['FAC_NAME'] == str )) :
@@ -395,8 +475,20 @@ def marker_text( row, is_echo ):
     return text
 
 
-# Helps us make the map!
+#####################
+#  mapper(df, is_echo=True):
+#    
+# Display a map of the DataFrame passed in.
 # Based on https://medium.com/@bobhaffner/folium-markerclusters-and-fastmarkerclusters-1e03b01cb7b1
+#
+# Parameters:  
+#    df -- A DataFrame containing records with latitude and longitude fields
+#        that can be plotted on a map
+#    is_echo -- A flag indicating whether the data contains ECHO_EXPORTER fields
+#        that can identify the EPA programs tracked for facilities
+#
+#####################
+
 def mapper(df, is_echo=True):
     # Initialize the map
     m = folium.Map(
@@ -425,3 +517,29 @@ def mapper(df, is_echo=True):
 
     # Show the map
     return m
+
+#####################
+# write_file( df, base, type, state, region ):
+#    
+# Write a file of the DataFrame passed in.
+#
+# Parameters:  
+#    df -- The DataFrame to write.
+#    base -- The base name of the file to write.
+#    type -- The region type of the data.
+#    state -- The state (or None).
+#    region -- The region identifier, e.g. CD number, County, Zip code.
+#
+#####################
+def write_file( df, base, type, state, region ):
+    if ( len( df ) > 0 ):
+        filename = base
+        if ( type != 'Zip Code' ):
+            filename += '-' + state
+        if ( region is not None ):
+            filename += '-'
+        filename += '.csv'
+        df.to_csv( filename ) 
+        print( "Wrote " + filename )
+    else:
+        print( "There is no data to write." )
