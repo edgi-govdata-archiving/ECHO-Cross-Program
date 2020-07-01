@@ -345,29 +345,26 @@ def get_program_data( program, echo_data ):
     # Add lat and lon, facility name and REGISTRY_ID as fac_registry_id. 
     # (Note: not adding REGISTRY_ID right now as it is sometimes interpreted 
     # as an int and that messes with the charts...)
-    my_prog_data = pd.DataFrame()
+    my_prog_data = []
     no_data_ids = []
-    
-    # Look through all the facilities in my area and program and get supplemental 
-    # echo_data info
+
+    # Look through all the facilities in my area and program and get supplemental echo_data info
     if (program_data is None): # Handle no data
-        print("Sorry, we don't have data for this program! That could be an error" \
-            " on our part, or ECHO's, or because the data type doesn't apply to this area.")
+        print("Sorry, we don't have data for this program! That could be an error on our part, or ECHO's, or because the data type doesn't apply to this area.")
     else:
-        # breakpoint()
         for fac in program_data.itertuples():
             fac_id = fac.Index
+            reg_id = key[fac_id] # Look up this facility's Registry ID through its Program ID
             try:
-                reg_id = key[fac_id] # Look up this facility's Registry ID through its Program ID
-                echo_row = pd.DataFrame(echo_data.loc[reg_id].copy()).T.reset_index() # Find and filter to the corresponding row in ECHO_EXPORTER
-                echo_row = echo_row[['FAC_NAME', 'FAC_LAT', 'FAC_LONG']] # Keep only the columns we need
-                program_row =  pd.DataFrame([list(fac)[1:]], columns=program_data.columns.values) # Turn the program_data tuple into a DataFrame
-                full_row = pd.concat([program_row, echo_row], axis=1) # Join the EE row df and the program row df
-                frames = [my_prog_data, full_row]
-                my_prog_data = pd.concat( frames, ignore_index=False)
+                e=echo_data.loc[echo_data.index==reg_id].copy()[['FAC_NAME', 'FAC_LAT', 'FAC_LONG', 'DFR_URL']].to_dict('index')
+                e = e[reg_id] # remove indexer
+                p =  fac._asdict()
+                e.update(p)
+                my_prog_data.append(e)
             except KeyError:
                 # The facility wasn't found in the program data.
                 no_data_ids.append( fac.Index )
+
     return my_prog_data
 
 
