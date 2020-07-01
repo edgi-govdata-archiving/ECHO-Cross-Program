@@ -393,6 +393,7 @@ def show_chart( program, region, data, state=None, fac_name=None ):
     if (program.name == "Water Quarterly Violations"): 
         year = data["YEARQTR"].astype("str").str[0:4:1]
         data["YEARQTR"] = year
+        data = data.drop(columns=['FAC_LAT', 'FAC_LONG']) # Remove lat/longs
         d = data.groupby(pd.to_datetime(data['YEARQTR'], format="%Y").dt.to_period("Y")).sum()
         d.index = d.index.strftime('%Y')
         d = d[ d.index > '2000' ]
