@@ -38,11 +38,11 @@ def make_data_sets():
                     date_field='FISCAL_YEAR', date_format='%Y', sql=my_sql )
     data_sets[ ds.name ] = ds
     ds = DataSet( name='Air Violations',  echo_type="AIR",
-                    table_name='ICIS-AIR_VIOLATION_HISTORY', idx_field='PGM_SYS_ID', 
+                    table_name='ICIS-AIR_VIOLATION_HISTORY', idx_field='pgm_sys_id', 
                     date_field='HPV_DAYZERO_DATE', date_format='%m-%d-%Y' )
     data_sets[ ds.name ] = ds
     ds = DataSet( name='Air Formal Actions', echo_type="AIR",
-                    table_name='ICIS-AIR_FORMAL_ACTIONS', idx_field='PGM_SYS_ID',
+                    table_name='ICIS-AIR_FORMAL_ACTIONS', idx_field='pgm_sys_id',
                     date_field='SETTLEMENT_ENTERED_DATE', date_format='%m/%d/%Y' )
     data_sets[ ds.name ] = ds
     ds = DataSet( name='Air Compliance', echo_type="AIR",

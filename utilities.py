@@ -321,7 +321,6 @@ def get_program_data( program, echo_data ):
         tri_registry_ids = echo_data[echo_data['TRI_FLAG'] == 'Y'].index.values
         id_set = np.union1d( ghg_registry_ids, tri_registry_ids )
         registry_ids = list(id_set)
-        # breakpoint()
         program_data = program.get_data( ee_ids=registry_ids )
         key = { i : i for i in registry_ids }
     elif ( program.name == "Greenhouse Gases" or program.name == "Toxic Releases" ):
@@ -344,13 +343,16 @@ def get_program_data( program, echo_data ):
     
     # Find the facility that matches the program data, by REGISTRY_ID.  
     # Add lat and lon, facility name and REGISTRY_ID as fac_registry_id. 
-    # (Note: not adding REGISTRY_ID right now as it is sometimes interpreted as an int and that messes with the charts...)
+    # (Note: not adding REGISTRY_ID right now as it is sometimes interpreted 
+    # as an int and that messes with the charts...)
     my_prog_data = pd.DataFrame()
     no_data_ids = []
     
-    # Look through all the facilities in my area and program and get supplemental echo_data info
+    # Look through all the facilities in my area and program and get supplemental 
+    # echo_data info
     if (program_data is None): # Handle no data
-        print("Sorry, we don't have data for this program! That could be an error on our part, or ECHO's, or because the data type doesn't apply to this area.")
+        print("Sorry, we don't have data for this program! That could be an error" \
+            " on our part, or ECHO's, or because the data type doesn't apply to this area.")
     else:
         for fac in program_data.itertuples():
             fac_id = fac.Index
@@ -429,7 +431,7 @@ def show_chart( program, region, data, state=None, fac_name=None ):
                 ax = d.plot(kind='bar', title = chart_title, figsize=(20, 10), legend=False, fontsize=16)
                 ax
             else:
-                print( "There is no data for this program and region." )
+                print( "There is no data for this program and region after 2000." )
 
         except AttributeError:
             print("There's no data to chart for " + program.name + " !")
@@ -536,8 +538,9 @@ def write_file( df, base, type, state, region ):
         filename = base
         if ( type != 'Zip Code' ):
             filename += '-' + state
+        filename += '-' + type
         if ( region is not None ):
-            filename += '-'
+            filename += '-' + str(region)
         filename += '.csv'
         df.to_csv( filename ) 
         print( "Wrote " + filename )
