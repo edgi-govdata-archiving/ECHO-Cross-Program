@@ -354,6 +354,7 @@ def get_program_data( program, echo_data ):
         print("Sorry, we don't have data for this program! That could be an error" \
             " on our part, or ECHO's, or because the data type doesn't apply to this area.")
     else:
+        # breakpoint()
         for fac in program_data.itertuples():
             fac_id = fac.Index
             try:
