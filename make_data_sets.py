@@ -97,9 +97,9 @@ def make_data_sets():
                     table_name='SDWA_SERIOUS_VIOLATORS', idx_field='PWSID',
                     date_field='FISCAL_YEAR', date_format='%Y' )
     data_sets[ ds.name ] = ds
-    ds = DataSet( name='SDWA Return to Compliance', echo_type="SDWA",
-                    table_name='SDWA_RETURN_TO_COMPLIANCE', idx_field='PWSID',
-                    date_field='FISCAL_YEAR', date_format='%Y' )
-    data_sets[ ds.name ] = ds
+    # ds = DataSet( name='SDWA Return to Compliance', echo_type="SDWA",
+    #                 table_name='SDWA_RETURN_TO_COMPLIANCE', idx_field='PWSID',
+    #                 date_field='FISCAL_YEAR', date_format='%Y' )
+    # data_sets[ ds.name ] = ds
     return data_sets
 
