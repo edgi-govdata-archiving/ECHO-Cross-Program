@@ -8,6 +8,7 @@ from folium.plugins import FastMarkerCluster
 import ipywidgets as widgets
 from ipywidgets import interact, interactive, fixed, interact_manual, Layout
 from ECHO_modules.DataSet import get_data
+from ECHO_modules.geographies import region_field, states
 
 from IPython.display import display
 
@@ -30,19 +31,6 @@ font = {'family' : 'DejaVu Sans',
         'size'   : 16}
 plt.rc('font', **font)
 plt.rc('legend', fancybox = True, framealpha=1, shadow=True, borderpad=1)
-
-states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA", 
-          "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", 
-          "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", 
-          "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", 
-          "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
-
-region_field = { 
-    'State': { "field": 'FAC_STATE' },
-    'Congressional District': { "field": 'FAC_DERIVED_CD113' },
-    'County': { "field": 'FAC_COUNTY' },
-    'Zip Code': { "field": 'FAC_DERIVED_ZIP' }
-}
 
 
 #####################
@@ -161,7 +149,7 @@ def show_pick_region_widget( type, state_widget=None ):
 
 
 #####################
-# show_data_set_widget( data_sets, echo_data ):
+# show_data_set_widget( data_sets ):
 #    
 # Create and return a dropdown list of data sets with appropriate
 # flags set in the echo_data. 
@@ -169,20 +157,14 @@ def show_pick_region_widget( type, state_widget=None ):
 # Parameters:
 #    data_sets -- The Dictionary of data sets. Values are instances
 #        of class DataSet.
-#    echo_data -- The ECHO_EXPORTER data with flags for program types
 #
 # Return: The widget of data set choices
 #
 #####################
 
-def show_data_set_widget( data_sets, echo_data ):
-    # Only list the data set if it has the correct flag set.
-    data_set_choices = []
-    for k, v in data_sets.items():
-        if ( v.has_echo_flag( echo_data ) ):
-            data_set_choices.append( k )
+def show_data_set_widget( data_sets ):
     
-    # data_set_choices = list( data_sets.keys() )
+    data_set_choices = list( data_sets.keys() )
     
     data_set_widget=widgets.Dropdown(
         options=list(data_set_choices),
@@ -219,153 +201,6 @@ def show_fac_widget( fac_series ):
     )
     display(widget)
     return widget
-
-
-#####################
-#  show_fac_pgm_widget( fac_data, data_sets ):
-#    
-# Create and return a dropdown list of program data sets associated
-# with the facility (ECHO_EXPORTER) data.
-#
-# Parameters:
-#    fac_data -- A DataFrame of ECHO_EXPORTER facilities
-#    data_sets -- The Dictionary of DataSet instances
-#
-# Return: The widget with associated data sets
-#
-#####################
-
-def show_fac_pgm_widget( fac_data, data_sets ):
-    data_set_choices = []
-    for k, v in data_sets.items():
-        if ( v.has_echo_flag( fac_data ) ):
-            data_set_choices.append( k )
-    
-    widget=widgets.Dropdown(
-        options=data_set_choices,
-        description='Data sets:',
-        disabled=False,
-    )
-    display(widget)
-    return widget
-
-
-#####################
-#  get_echo_data( region_type, region_widget, state_widget = None ):
-#    
-# Query the database for ECHO_EXPORTER data appropriate to the parameters.
-#
-# Parameters:
-#    region_type -- The type of region
-#    region_widget -- The widget that will contain the region selected.
-#    state_widget -- The widget that will contain the state selected.
-#
-# Return: A DataFrame of the data retrieved.
-#
-#####################
-
-def get_echo_data( region_type, region_widget, state_widget = None ):
-    if ( region_type == 'State'):
-        region_value = state_widget.value
-    else:
-        region_value = region_widget.value
-
-    echo_data_sql = "select * from ECHO_EXPORTER where " + region_field[region_type]['field']
-    if ( region_type == 'County' ):    
-        echo_data_sql += " like \'" + str( region_value) + "%\'"
-    else:
-        echo_data_sql += " = '" + str( region_value ) + "'"
-    if ( region_type == 'Congressional District' or region_type == 'County' ):
-        echo_data_sql += " and FAC_STATE = \'" + state_widget.value + "\'"
-    echo_data = None
-    try:
-        echo_data = get_data( echo_data_sql, 'REGISTRY_ID' )
-    except pd.errors.EmptyDataError:
-        pass
-    if ( echo_data.empty ):
-        print("\nThere are no EPA facilities in this region.\n")
-    else:
-        print("\nThere are %s EPA facilities in this region tracked in the ECHO database." \
-              %(echo_data.shape[0] ))
-    return echo_data
-
-
-#####################
-#  get_program_data( program, echo_data ):
-#    
-# Based on the program requested, get the appropriate IDs from the echo_data.
-# Then use the program DataSet class to query the database for the set of
-# records by the ID list.
-#
-# Parameters:
-#    program -- An instance of class DataSet for a program
-#    echo_data -- The ECHO_EXPORTER facility records containing flags and
-#        IDs for programs associated with the facilities
-#
-# Return: A DataFrame containing the retrieved program data.
-#
-#####################
-
-def get_program_data( program, echo_data ):
-    program_data = None
-    key=dict() # Create a way to look up Registry IDs in ECHO_EXPORTER later
-    
-    # We need to provide a custom list of program ids for some programs.
-    if ( program.name == "Air Inspections" or program.name == "Air Enforcements" ):
-        # The REGISTRY_ID field is the index of the echo_data
-        registry_ids = echo_data[echo_data['AIR_FLAG'] == 'Y'].index.values
-        key = { i : i for i in registry_ids }
-        program_data = program.get_data( ee_ids=registry_ids )
-    elif ( program.name == "Combined Air Emissions" ):
-        ghg_registry_ids = echo_data[echo_data['GHG_FLAG'] == 'Y'].index.values
-        tri_registry_ids = echo_data[echo_data['TRI_FLAG'] == 'Y'].index.values
-        id_set = np.union1d( ghg_registry_ids, tri_registry_ids )
-        registry_ids = list(id_set)
-        program_data = program.get_data( ee_ids=registry_ids )
-        key = { i : i for i in registry_ids }
-    elif ( program.name == "Greenhouse Gases" or program.name == "Toxic Releases" ):
-        program_flag = program.echo_type + '_FLAG'
-        registry_ids = echo_data[echo_data[ program_flag ] == 'Y'].index.values
-        program_data = program.get_data( ee_ids=registry_ids )
-        key = { i : i for i in registry_ids }
-    else:
-        ids_string = program.echo_type + '_IDS'
-        ids = list()
-        registry_ids = list()
-        for index, value in echo_data[ ids_string ].items():
-            try:
-                for this_id in value.split():
-                    ids.append( this_id )
-                    key[this_id]=index
-            except ( KeyError, AttributeError ) as e:
-                pass
-        program_data = program.get_data( ee_ids=ids )
-    
-    # Find the facility that matches the program data, by REGISTRY_ID.  
-    # Add lat and lon, facility name and REGISTRY_ID as fac_registry_id. 
-    # (Note: not adding REGISTRY_ID right now as it is sometimes interpreted 
-    # as an int and that messes with the charts...)
-    my_prog_data = []
-    no_data_ids = []
-
-    # Look through all the facilities in my area and program and get supplemental echo_data info
-    if (program_data is None): # Handle no data
-        print("Sorry, we don't have data for this program! That could be an error on our part, or ECHO's, or because the data type doesn't apply to this area.")
-    else:
-        for fac in program_data.itertuples():
-            fac_id = fac.Index
-            reg_id = key[fac_id] # Look up this facility's Registry ID through its Program ID
-            try:
-                e=echo_data.loc[echo_data.index==reg_id].copy()[['FAC_NAME', 'FAC_LAT', 'FAC_LONG', 'DFR_URL']].to_dict('index')
-                e = e[reg_id] # remove indexer
-                p =  fac._asdict()
-                e.update(p)
-                my_prog_data.append(e)
-            except KeyError:
-                # The facility wasn't found in the program data.
-                no_data_ids.append( fac.Index )
-
-    return my_prog_data
 
 
 #####################
