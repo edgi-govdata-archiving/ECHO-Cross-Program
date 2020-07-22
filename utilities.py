@@ -293,19 +293,20 @@ def marker_text( row, is_echo ):
         except TypeError:
             print( "A facility was found without name. ")
         if ( is_echo ):
-            if ( row['AIR_FLAG'] == 'Y' ):
-                text += 'CAA, ' 
-            if ( row['NPDES_FLAG'] == 'Y' ):
-                text += 'CWA, ' 
-            if ( row['SDWIS_FLAG'] == 'Y' ):
-                text += 'SDWIS, ' 
-            if ( row['RCRA_FLAG'] == 'Y' ):
-                text += 'RCRA, ' 
-            if ( row['TRI_FLAG'] == 'Y' ):
-                text += 'TRI, ' 
-            if ( row['GHG_FLAG'] == 'Y' ):
-                text += 'GHG, ' 
-            text = text[:-1]
+##            if ( row['AIR_FLAG'] == 'Y' ):
+##                text += 'CAA, ' 
+##            if ( row['NPDES_FLAG'] == 'Y' ):
+##                text += 'CWA, ' 
+##            if ( row['SDWIS_FLAG'] == 'Y' ):
+##                text += 'SDWIS, ' 
+##            if ( row['RCRA_FLAG'] == 'Y' ):
+##                text += 'RCRA, ' 
+##            if ( row['TRI_FLAG'] == 'Y' ):
+##                text += 'TRI, ' 
+##            if ( row['GHG_FLAG'] == 'Y' ):
+##                text += 'GHG, ' 
+##            text = text[:-1]
+            
             text += " - <p><a href='"+row["DFR_URL"]
             text += "' target='_blank'>Link to ECHO detailed report</a></p>"
     return text
