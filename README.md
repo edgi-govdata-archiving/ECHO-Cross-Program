@@ -4,9 +4,14 @@
 Jupyter notebooks for ECHO that use data from multiple
 EPA programs.
 
+[Repo website](https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/facility-all-programs.ipynb)
+
 ---
 
 ## Notebook validation
+
+### Link to Notebook [Here](https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/facility-all-programs.ipynb)
+
 **Basic function**
 - [ ] Does it run all the way through as a Colab notebook when you are signed in as someone with no special EDGI access?
 - [ ] Does it create the outputs it is supposed to create (graphs, data exports, etc.)?
