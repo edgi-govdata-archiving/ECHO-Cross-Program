@@ -91,7 +91,6 @@ def show_state_widget():
         description='State:',
         disabled=False,
     )
-    output_state = widgets.Output()
     
     display( dropdown_state )
     return dropdown_state
@@ -112,7 +111,6 @@ def show_state_widget():
 #####################
 
 def show_pick_region_widget( type, state_widget=None ):
-    selected_region_field = region_field[ type ]
     region_widget = None
     
     if ( type != 'Zip Code' ):
@@ -368,7 +366,8 @@ def mapper(df, is_echo=True):
 #    region -- The region identifier, e.g. CD number, County, Zip code.
 #
 #####################
-def write_file( df, base, type, state, region ):
+def write_file( dataset, base, type, state, region ):
+    df = dataset.results[(type, region, state)].dataframe
     if ( len( df ) > 0 ):
         filename = base
         if ( type != 'Zip Code' ):
