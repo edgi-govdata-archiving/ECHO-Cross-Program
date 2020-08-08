@@ -366,8 +366,7 @@ def mapper(df, is_echo=True):
 #    region -- The region identifier, e.g. CD number, County, Zip code.
 #
 #####################
-def write_file( dataset, base, type, state, region ):
-    df = dataset.results[(type, region, state)].dataframe
+def write_file( df, base, type, state, region ):
     if ( len( df ) > 0 ):
         filename = base
         if ( type != 'Zip Code' ):
