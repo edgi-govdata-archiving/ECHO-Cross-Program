@@ -1,5 +1,7 @@
 # Import libraries
 
+import csv
+import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -366,7 +368,7 @@ def mapper(df, is_echo=True):
 #    region -- The region identifier, e.g. CD number, County, Zip code.
 #
 #####################
-def write_file( df, base, type, state, region ):
+def write_dataset( df, base, type, state, region ):
     if ( len( df ) > 0 ):
         filename = base
         if ( type != 'Zip Code' ):
@@ -379,3 +381,9 @@ def write_file( df, base, type, state, region ):
         print( "Wrote " + filename )
     else:
         print( "There is no data to write." )
+
+def make_filename( base, type, state, region ):
+    x = datetime.datetime.now()
+    filename = base + '_' + state + '-' + str(region) + '-' \
+                + x.strftime( "%m%d%y") +'.csv'
+    return filename
