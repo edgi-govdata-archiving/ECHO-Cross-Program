@@ -384,6 +384,8 @@ def write_dataset( df, base, type, state, region ):
 
 def make_filename( base, type, state, region ):
     x = datetime.datetime.now()
-    filename = base + '_' + state + '-' + str(region) + '-' \
-                + x.strftime( "%m%d%y") +'.csv'
+    filename = base + '_' + state
+    if ( region is not None ):
+        filename += '-' + str(region)
+    filename += '-' + x.strftime( "%m%d%y") +'.csv'
     return filename
