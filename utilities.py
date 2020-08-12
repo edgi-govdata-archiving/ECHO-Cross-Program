@@ -369,7 +369,7 @@ def mapper(df, is_echo=True):
 #
 #####################
 def write_dataset( df, base, type, state, region ):
-    if ( len( df ) > 0 ):
+    if ( df is not None and len( df ) > 0 ):
         filename = base
         if ( type != 'Zip Code' ):
             filename += '-' + state
