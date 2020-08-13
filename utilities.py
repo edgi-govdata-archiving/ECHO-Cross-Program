@@ -361,7 +361,7 @@ def mapper(df, is_echo=True):
     return m
 
 #####################
-# write_file( df, base, type, state, region ):
+# write_dataset( df, base, type, state, region ):
 #    
 # Write a file of the DataFrame passed in.
 #
