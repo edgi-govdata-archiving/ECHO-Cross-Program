@@ -225,7 +225,7 @@ def show_chart( program, region, data, state=None, fac_name=None ):
         chart_title += ' - ' + fac_name
 
     # Handle NPDES_QNCR_HISTORY because there are multiple counts we need to sum
-    if (program.name == "Water Quarterly Violations"): 
+    if (program.name == "CWA Violations"): 
         year = data["YEARQTR"].astype("str").str[0:4:1]
         data["YEARQTR"] = year
         data = data.drop(columns=['FAC_LAT', 'FAC_LONG', 'FAC_ZIP', 
