@@ -229,7 +229,7 @@ def show_chart( program, region, data, state=None, fac_name=None ):
         year = data["YEARQTR"].astype("str").str[0:4:1]
         data["YEARQTR"] = year
         data = data.drop(columns=['FAC_LAT', 'FAC_LONG']) # Remove lat/longs
-        d = data.groupby(pd.to_datetime(data['YEARQTR'], format="%Y").dt.to_period("Y")).sum()
+        d = data.groupby(pd.to_datetime(data['YEARQTR'], format="%Y", errors='coerce').dt.to_period("Y")).sum()
         d.index = d.index.strftime('%Y')
         d = d[ d.index > '2000' ]
 
@@ -240,7 +240,7 @@ def show_chart( program, region, data, state=None, fac_name=None ):
          program.name == "SDWA Serious Violators" or program.name == "SDWA Return to Compliance"):
         year = data["FISCAL_YEAR"].astype("str")
         data["FISCAL_YEAR"] = year
-        d = data.groupby(pd.to_datetime(data['FISCAL_YEAR'], format="%Y").dt.to_period("Y"))[['PWS_NAME']].count()
+        d = data.groupby(pd.to_datetime(data['FISCAL_YEAR'], format="%Y", errors='coerce').dt.to_period("Y"))[['PWS_NAME']].count()
         d.index = d.index.strftime('%Y')
         d = d[ d.index > '2000' ]
 
@@ -256,7 +256,7 @@ def show_chart( program, region, data, state=None, fac_name=None ):
     # All other programs
     else:
         try:
-            d = data.groupby(pd.to_datetime(data[program.date_field], format=program.date_format))[[program.date_field]].count()
+            d = data.groupby(pd.to_datetime(data[program.date_field], format=program.date_format, errors='coerce'))[[program.date_field]].count()
             d = d.resample("Y").sum()
             d.index = d.index.strftime('%Y')
             d = d[ d.index > '2000' ]
