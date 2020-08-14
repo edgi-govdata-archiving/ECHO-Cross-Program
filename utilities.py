@@ -1,5 +1,6 @@
 # Import libraries
 
+import os 
 import csv
 import datetime
 import pandas as pd
@@ -375,7 +376,9 @@ def mapper(df, is_echo=True):
 #####################
 def write_dataset( df, base, type, state, region ):
     if ( df is not None and len( df ) > 0 ):
-        filename = base
+        if ( not os.path.exists( 'CSVs' )):
+            os.makedirs( 'CSVs' )
+        filename = 'CSVs/' + base
         if ( type != 'Zip Code' ):
             filename += '-' + state
         filename += '-' + type
