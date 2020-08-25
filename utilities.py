@@ -1,5 +1,8 @@
 # Import libraries
 
+import os 
+import csv
+import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -91,7 +94,6 @@ def show_state_widget():
         description='State:',
         disabled=False,
     )
-    output_state = widgets.Output()
     
     display( dropdown_state )
     return dropdown_state
@@ -112,7 +114,6 @@ def show_state_widget():
 #####################
 
 def show_pick_region_widget( type, state_widget=None ):
-    selected_region_field = region_field[ type ]
     region_widget = None
     
     if ( type != 'Zip Code' ):
@@ -248,12 +249,12 @@ def show_chart( program, region, data, state=None, fac_name=None ):
 
         ax = d.plot(kind='bar', title = chart_title, figsize=(20, 10), fontsize=16)
         ax        
-    elif (program.name == "Combined Air Emissions" or program.name == "Greenhouse Gases" \
+    elif (program.name == "Combined Air Emissions" or program.name == "Greenhouse Gas Emissions" \
               or program.name == "Toxic Releases"):
         d = data.groupby( 'REPORTING_YEAR' )[['ANNUAL_EMISSION']].sum()
         ax = d.plot(kind='bar', title = chart_title, figsize=(20, 10), fontsize=16)
         ax.set_xlabel( 'Reporting Year' )
-        ax.set_ylabel( 'Pounds of Emissions')
+        ax.set_ylabel( data["UNIT_OF_MEASURE"].iloc[0]) # For GHG, this is in metric tons, not pounds. Could pull from the 
         ax        
     # All other programs
     else:
@@ -358,7 +359,7 @@ def mapper(df, is_echo=True):
     return m
 
 #####################
-# write_file( df, base, type, state, region ):
+# write_dataset( df, base, type, state, region ):
 #    
 # Write a file of the DataFrame passed in.
 #
@@ -370,9 +371,11 @@ def mapper(df, is_echo=True):
 #    region -- The region identifier, e.g. CD number, County, Zip code.
 #
 #####################
-def write_file( df, base, type, state, region ):
-    if ( len( df ) > 0 ):
-        filename = base
+def write_dataset( df, base, type, state, region ):
+    if ( df is not None and len( df ) > 0 ):
+        if ( not os.path.exists( 'CSVs' )):
+            os.makedirs( 'CSVs' )
+        filename = 'CSVs/' + base
         if ( type != 'Zip Code' ):
             filename += '-' + state
         filename += '-' + type
@@ -383,3 +386,11 @@ def write_file( df, base, type, state, region ):
         print( "Wrote " + filename )
     else:
         print( "There is no data to write." )
+
+def make_filename( base, type, state, region ):
+    x = datetime.datetime.now()
+    filename = base + '_' + state
+    if ( region is not None ):
+        filename += '-' + str(region)
+    filename += '-' + x.strftime( "%m%d%y") +'.csv'
+    return filename
