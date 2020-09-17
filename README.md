@@ -1,8 +1,12 @@
  [![Code of Conduct](https://img.shields.io/badge/%E2%9D%A4-code%20of%20conduct-blue.svg?style=flat)](https://github.com/edgi-govdata-archiving/overview/blob/master/CONDUCT.md)
 
 # ECHO-Cross-Programs
-Jupyter notebooks for ECHO that use data from multiple
-EPA programs. Link to the notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/AllPrograms.ipynb#scrollTo=LrapRSxzVAzr
+This repository contains Jupyter notebooks for ECHO that use data from multiple
+EPA programs. 
+- Link to the AllPrograms notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/AllPrograms.ipynb
+- Link to the Cross-Programs notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO-Cross-Programs.ipynb
+- Link to the ECHO National notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO_National.ipynb
+
 
 ---
 
