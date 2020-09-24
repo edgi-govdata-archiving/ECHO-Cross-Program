@@ -389,11 +389,12 @@ def write_dataset( df, base, type, state, region ):
 
 def make_filename( base, type, state, region, filetype='csv' ):
     # If type is 'State', the state name is the region.
+    dir = 'Output/'
     if ( type == 'State' ):
-        dir = region
+        dir += region
         filename = base + '_' + region
     else:
-        dir = state
+        dir += state
         filename = base + '_' + state
         if ( region is not None ):
             dir += str(region)
