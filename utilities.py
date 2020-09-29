@@ -387,13 +387,21 @@ def write_dataset( df, base, type, state, region ):
     else:
         print( "There is no data to write." )
 
-def make_filename( base, type, state, region ):
-    x = datetime.datetime.now()
+def make_filename( base, type, state, region, filetype='csv' ):
+    # If type is 'State', the state name is the region.
+    dir = 'Output/'
     if ( type == 'State' ):
+        dir += region
         filename = base + '_' + region
     else:
+        dir += state
         filename = base + '_' + state
         if ( region is not None ):
+            dir += str(region)
             filename += '-' + str(region)
-    filename += '-' + x.strftime( "%m%d%y") +'.csv'
-    return filename
+    x = datetime.datetime.now()
+    filename += '-' + x.strftime( "%m%d%y") +'.' + filetype
+    dir += '/'
+    if ( not os.path.exists( dir )):
+        os.makedirs( dir )
+    return dir + filename
