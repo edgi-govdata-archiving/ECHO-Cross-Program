@@ -2,7 +2,8 @@
 
 # ECHO-Cross-Programs
 This repository contains Jupyter notebooks for ECHO that use data from multiple
-EPA programs. 
+EPA programs. This notebook lets viewers examine facilities closely by state, county, congressional district, or zip code, and collects the program-specific data for all the facilities in the region. The Jupyter Notebook is equipped to look at emissions, violations, inspections, and enforcement for the Clean Air Act, Clean Water Act, and Resouce Conservation and Recovery Act.
+
 - Link to the AllPrograms notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/AllPrograms.ipynb
 - Link to the Cross-Programs notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO-Cross-Programs.ipynb
 - Link to the ECHO National notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO_National.ipynb
