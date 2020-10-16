@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import folium
+import seaborn as sns
 from folium.plugins import FastMarkerCluster
 import ipywidgets as widgets
 from ipywidgets import interact, interactive, fixed, interact_manual, Layout
@@ -203,120 +204,58 @@ def show_fac_widget( fac_series ):
     display(widget)
     return widget
 
-
-#####################
-#  show_chart( program, region, data, state=None, fac_name=None ):
-#    
-# Display a chart based on the parameters.
-#
-# Parameters:
-#    program -- A Dictionary entry with name and DataSet to be displayed
-#    region -- The region, for the chart's title
-#    state -- The state, for the chart's title
-#    fac_name -- The name of the facility, for the chart's title
-#
-#####################
-
-def show_chart( program, region, data, state=None, fac_name=None ):
-    chart_title = program.name 
-    if ( state is not None ):
-        chart_title += ' - ' + state
-    chart_title += ' - ' + str( region )
-    if ( fac_name is not None ):
-        chart_title += ' - ' + fac_name
-
-    # Handle NPDES_QNCR_HISTORY because there are multiple counts we need to sum
-    if (program.name == "CWA Violations"): 
-        year = data["YEARQTR"].astype("str").str[0:4:1]
-        data["YEARQTR"] = year
-        data = data.drop(columns=['FAC_LAT', 'FAC_LONG', 'FAC_ZIP', 
-                'FAC_EPA_REGION', 'FAC_DERIVED_WBD', 'FAC_DERIVED_CD113',
-                'FAC_PERCENT_MINORITY', 'FAC_POP_DEN'])
-        d = data.groupby(pd.to_datetime(data['YEARQTR'], format="%Y", errors='coerce').dt.to_period("Y")).sum()
-        d.index = d.index.strftime('%Y')
-        d = d[ d.index > '2000' ]
-
-        ax = d.plot(kind='bar', title = chart_title, figsize=(20, 10), fontsize=16)
-        ax
-    # These data sets use a FISCAL_YEAR field
-    elif (program.name == "SDWA Public Water Systems" or program.name == "SDWA Violations" or
-         program.name == "SDWA Serious Violators" or program.name == "SDWA Return to Compliance"):
-        year = data["FISCAL_YEAR"].astype("str")
-        data["FISCAL_YEAR"] = year
-        d = data.groupby(pd.to_datetime(data['FISCAL_YEAR'], format="%Y", errors='coerce').dt.to_period("Y"))[['PWS_NAME']].count()
-        d.index = d.index.strftime('%Y')
-        d = d[ d.index > '2000' ]
-
-        ax = d.plot(kind='bar', title = chart_title, figsize=(20, 10), fontsize=16)
-        ax        
-    elif (program.name == "Combined Air Emissions" or program.name == "Greenhouse Gas Emissions" \
-              or program.name == "Toxic Releases"):
-        d = data.groupby( 'REPORTING_YEAR' )[['ANNUAL_EMISSION']].sum()
-        ax = d.plot(kind='bar', title = chart_title, figsize=(20, 10), fontsize=16)
-        ax.set_xlabel( 'Reporting Year' )
-        ax.set_ylabel( data["UNIT_OF_MEASURE"].iloc[0]) # For GHG, this is in metric tons, not pounds. Could pull from the 
-        ax        
-    # All other programs
-    else:
-        try:
-            d = data.groupby(pd.to_datetime(data[program.date_field], format=program.date_format, errors='coerce'))[[program.date_field]].count()
-            d = d.resample("Y").sum()
-            d.index = d.index.strftime('%Y')
-            d = d[ d.index > '2000' ]
-
-            if ( len(d) > 0 ):
-                ax = d.plot(kind='bar', title = chart_title, figsize=(20, 10), legend=False, fontsize=16)
-                ax
-            else:
-                print( "There is no data for this program and region after 2000." )
-
-        except AttributeError:
-            print("There's no data to chart for " + program.name + " !")
+def get_active_facilities( state, region_type, region_selected ):
+    if ( region_type == 'State' ):
+        sql = 'select * from "ECHO_EXPORTER" where "FAC_STATE" = \'{}\''
+        sql += ' and "FAC_ACTIVE_FLAG" = \'Y\''
+        sql = sql.format( state )
+        df_active = get_data( sql, 'REGISTRY_ID' )
+    elif ( region_type == 'Congressional District'):
+        sql = 'select * from "ECHO_EXPORTER" where "FAC_STATE" = \'{}\''
+        sql += ' and "FAC_DERIVED_CD113" = \'{}\''
+        sql += ' and "FAC_ACTIVE_FLAG" = \'Y\''
+        sql = sql.format( state, region_selected )
+        df_active = get_data( sql, 'REGISTRY_ID' )
+    elif ( region_type == 'County' ):
+        sql = 'select * from "ECHO_EXPORTER" where "FAC_STATE" = \'{}\''
+        sql += ' and "FAC_COUNTY" = \'{}\''
+        sql += ' and "FAC_ACTIVE_FLAG" = \'Y\''
+        sql = sql.format( state, region_selected )
+        df_active = get_data( sql, 'REGISTRY_ID' )
+    else:  ## Zip code
+        sql = 'select * from "ECHO_EXPORTER" where "FAC_ZIP" = \'{}\''
+        sql += ' and "FAC_ACTIVE_FLAG" = \'Y\''
+        sql = sql.format( region_selected )
+        df_active = get_data( sql, 'REGISTRY_ID' )
+    return df_active
 
 
 #####################
-#  marker_text( row, is_echo ):
+#  marker_text( row ):
 #    
 # Create a string with information about the facility or program instance.
 #
 # Parameters:  
 #    row -- The row of data associated with the marker.
-#    is_echo -- If True, put some information with the marker to show the 
-#        programs that track the facility.
 #
 # Return:  The text to put with the marker
 #
 #####################
 
-def marker_text( row, is_echo ):
+def marker_text( row ):
     text = ""
     if ( type( row['FAC_NAME'] == str )) :
         try:
             text = row["FAC_NAME"] + ' - '
         except TypeError:
-            print( "A facility was found without name. ")
-        if ( is_echo ):
-##            if ( row['AIR_FLAG'] == 'Y' ):
-##                text += 'CAA, ' 
-##            if ( row['NPDES_FLAG'] == 'Y' ):
-##                text += 'CWA, ' 
-##            if ( row['SDWIS_FLAG'] == 'Y' ):
-##                text += 'SDWIS, ' 
-##            if ( row['RCRA_FLAG'] == 'Y' ):
-##                text += 'RCRA, ' 
-##            if ( row['TRI_FLAG'] == 'Y' ):
-##                text += 'TRI, ' 
-##            if ( row['GHG_FLAG'] == 'Y' ):
-##                text += 'GHG, ' 
-##            text = text[:-1]
-            
-            text += " - <p><a href='"+row["DFR_URL"]
-            text += "' target='_blank'>Link to ECHO detailed report</a></p>"
+            print( "A facility was found without a name. ")
+        text += " - <p><a href='"+row["DFR_URL"]
+        text += "' target='_blank'>Link to ECHO detailed report</a></p>"
     return text
 
 
 #####################
-#  mapper(df, is_echo=True):
+#  mapper(df):
 #    
 # Display a map of the DataFrame passed in.
 # Based on https://medium.com/@bobhaffner/folium-markerclusters-and-fastmarkerclusters-1e03b01cb7b1
@@ -324,12 +263,10 @@ def marker_text( row, is_echo ):
 # Parameters:  
 #    df -- A DataFrame containing records with latitude and longitude fields
 #        that can be plotted on a map
-#    is_echo -- A flag indicating whether the data contains ECHO_EXPORTER fields
-#        that can identify the EPA programs tracked for facilities
 #
 #####################
 
-def mapper(df, is_echo=True):
+def mapper(df):
     # Initialize the map
     m = folium.Map(
         location = [df.mean()["FAC_LAT"], df.mean()["FAC_LONG"]]
@@ -343,7 +280,7 @@ def mapper(df, is_echo=True):
     for index, row in df.iterrows():
         mc.add_child(folium.CircleMarker(
             location = [row["FAC_LAT"], row["FAC_LONG"]],
-            popup = marker_text( row, is_echo ),
+            popup = marker_text( row ),
             radius = 8,
             color = "black",
             weight = 1,
@@ -405,3 +342,32 @@ def make_filename( base, type, state, region, filetype='csv' ):
     if ( not os.path.exists( dir )):
         os.makedirs( dir )
     return dir + filename
+
+def get_top_violators( df_active, flag, state, cd, noncomp_field, action_field, num_fac=10 ):
+    df_active = df_active.loc[ df_active[flag] == 'Y'].copy()
+    noncomp = df_active[ noncomp_field ]
+    noncomp_count = noncomp.str.count('S') + noncomp.str.count('V')
+    df_active['noncomp_count'] = noncomp_count
+    df_active = df_active[['FAC_NAME', 'noncomp_count', action_field,
+            'DFR_URL', 'FAC_LAT', 'FAC_LONG']]
+    df_active = df_active.sort_values( by=['noncomp_count', action_field], 
+            ascending=False )
+    df_active = df_active.head( num_fac )
+    return df_active   
+
+def chart_top_violators( ranked, state, cd, epa_pgm ):
+    sns.set(style='whitegrid')
+    fig, ax = plt.subplots(figsize=(20,10))
+    unit = ranked.index 
+    values = ranked['noncomp_count'] 
+    try:
+        g = sns.barplot(values, unit, order=list(unit), orient="h") 
+        g.set_title('{} facilities with the most non-compliant quarters in {} - {}'.format( 
+                epa_pgm, state, str( cd )))
+        ax.set_xlabel("Non-compliant quarters")
+        ax.set_ylabel("Facility")
+        ax.set_yticklabels(ranked["FAC_NAME"])
+        return ( g )
+    except TypeError as te:
+        print( "TypeError: {}".format( str(te) ))
+        return None
