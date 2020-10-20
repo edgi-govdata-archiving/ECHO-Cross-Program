@@ -1,3 +1,8 @@
+'''
+Provide a number of utility Python functions that can de-clutter
+the Jupyter notebooks that use them.
+'''
+
 # Import libraries
 
 import os 
@@ -37,18 +42,21 @@ plt.rc('font', **font)
 plt.rc('legend', fancybox = True, framealpha=1, shadow=True, borderpad=1)
 
 
-#####################
-#  fix_county_names( in_counties )
-#    
-# ECHO_EXPORTER has counties listed both as ALAMEDA and ALAMEDA COUNTY, seemingly
-# for every county.  We drop the 'COUNTY' so they only get listed once.
-#
-# Parameters:  in_counties -- list of county names
-# Return: The new list of counties without duplicates
-#
-#####################
-
 def fix_county_names( in_counties ):
+    '''
+    ECHO_EXPORTER has counties listed both as ALAMEDA and ALAMEDA COUNTY, seemingly
+    for every county.  We drop the 'COUNTY' so they only get listed once.
+
+    Parameters
+    ----------
+    in_counties : list of county names (str)
+
+    Returns
+    -------
+    list
+        The list of counties without duplicates
+    '''
+
     counties = []
     for county in in_counties:
         if (county.endswith( ' COUNTY' )):
@@ -58,16 +66,16 @@ def fix_county_names( in_counties ):
     return counties
 
 
-#####################
-#  show_region_type_widget()
-#    
-# Create and return a dropdown list of types of regions.
-#
-# Return: The widget 
-#
-#####################
-
 def show_region_type_widget():
+    '''
+    Create and return a dropdown list of types of regions
+
+    Returns
+    -------
+    widget
+        The dropdown widget with the list of regions
+    '''
+
     style = {'description_width': 'initial'}
     select_region_widget = widgets.Dropdown(
         options=region_field.keys(),
@@ -80,16 +88,16 @@ def show_region_type_widget():
     return select_region_widget
 
 
-#####################
-#  show_state_widget()
-#    
-# Create and return a dropdown list of states
-#
-# Return: The widget 
-#
-#####################
-
 def show_state_widget():
+    '''
+    Create and return a dropdown list of states
+
+    Returns
+    -------
+    widget
+        The dropdown widget with the state list
+    '''
+
     dropdown_state=widgets.Dropdown(
         options=states,
         description='State:',
@@ -100,21 +108,24 @@ def show_state_widget():
     return dropdown_state
 
 
-#####################
-# show_pick_region_widget( type, state_widget=None ):
-#    
-# Create and return a dropdown list of regions appropriate
-# to the input parameters
-#
-# Parameters:
-#    type -- The type of region
-#    state_widget -- The widget in which a state may have been selected.
-#
-# Return: The widget or None 
-#
-#####################
-
 def show_pick_region_widget( type, state_widget=None ):
+    '''
+    Create and return a dropdown list of regions appropriate
+    to the input parameters
+
+    Parameters
+    ----------
+    type : str
+        The type of region
+    state_widget : widget
+        The widget in which a state may have been selected
+
+    Returns
+    -------
+    widget
+        The dropdown widget with region choices
+    '''
+
     region_widget = None
     
     if ( type != 'Zip Code' ):
@@ -150,21 +161,21 @@ def show_pick_region_widget( type, state_widget=None ):
     return region_widget
 
 
-#####################
-# show_data_set_widget( data_sets ):
-#    
-# Create and return a dropdown list of data sets with appropriate
-# flags set in the echo_data. 
-#
-# Parameters:
-#    data_sets -- The Dictionary of data sets. Values are instances
-#        of class DataSet.
-#
-# Return: The widget of data set choices
-#
-#####################
-
 def show_data_set_widget( data_sets ):
+    '''
+    Create and return a dropdown list of data sets with appropriate
+    flags set in the echo_data.
+
+    Parameters
+    ----------
+    data_sets : dict
+        The data sets, key = name, value = DataSet object
+
+    Returns
+    -------
+    widget
+        The widget with data set choices
+    '''
     
     data_set_choices = list( data_sets.keys() )
     
@@ -177,20 +188,22 @@ def show_data_set_widget( data_sets ):
     return data_set_widget
 
 
-#####################
-#  show_fac_widget( fac_series ):
-#    
-# Create and return a dropdown list of facilities from the Series
-#
-# Parameters:
-#    fac_series -- A Series containing the facilities to be shown.
-#        It may have duplicates
-#
-# Return: The widget of facility names
-#
-#####################
-
 def show_fac_widget( fac_series ):
+    '''
+    Create and return a dropdown list of facilities from the 
+    input Series
+
+    Parameters
+    ----------
+    fac_series : Series
+        The facilities to be shown.  It may have duplicates.
+
+    Returns
+    -------
+    widget
+        The widget with facility names
+    '''
+
     fac_list = fac_series.dropna().unique()
     fac_list.sort()
     style = {'description_width': 'initial'}
@@ -204,7 +217,27 @@ def show_fac_widget( fac_series ):
     display(widget)
     return widget
 
+
 def get_active_facilities( state, region_type, region_selected ):
+    '''
+    Get a Dataframe with the ECHO_EXPORTER facilities with FAC_ACTIVE_FLAG
+    set to 'Y' for the region selected.
+
+    Parameters
+    ----------
+    state : str
+        The state, which could be None
+    region_type : str
+        The type of region:  'State', 'Congressional District', etc.
+    region_selected : str
+        The selected region of the specified region_type
+
+    Returns
+    -------
+    Dataframe
+        The active facilities returned from the database query
+    '''
+
     if ( region_type == 'State' ):
         sql = 'select * from "ECHO_EXPORTER" where "FAC_STATE" = \'{}\''
         sql += ' and "FAC_ACTIVE_FLAG" = \'Y\''
@@ -230,19 +263,20 @@ def get_active_facilities( state, region_type, region_selected ):
     return df_active
 
 
-#####################
-#  marker_text( row ):
-#    
-# Create a string with information about the facility or program instance.
-#
-# Parameters:  
-#    row -- The row of data associated with the marker.
-#
-# Return:  The text to put with the marker
-#
-#####################
-
 def marker_text( row ):
+    '''
+    Create a string with information about the facility or program instance.
+
+    Parameters
+    ----------
+    row : Dataframe row 
+
+    Returns
+    -------
+    str
+        The text to attach to the marker
+    '''
+
     text = ""
     if ( type( row['FAC_NAME'] == str )) :
         try:
@@ -254,19 +288,20 @@ def marker_text( row ):
     return text
 
 
-#####################
-#  mapper(df):
-#    
-# Display a map of the DataFrame passed in.
-# Based on https://medium.com/@bobhaffner/folium-markerclusters-and-fastmarkerclusters-1e03b01cb7b1
-#
-# Parameters:  
-#    df -- A DataFrame containing records with latitude and longitude fields
-#        that can be plotted on a map
-#
-#####################
-
 def mapper(df):
+    '''
+    Display a map of the Dataframe passed in.
+    Based on https://medium.com/@bobhaffner/folium-markerclusters-and-fastmarkerclusters-1e03b01cb7b1
+
+    Parameters
+    ----------
+    df : Dataframe
+
+    Returns
+    -------
+    folium.Map
+    '''
+
     # Initialize the map
     m = folium.Map(
         location = [df.mean()["FAC_LAT"], df.mean()["FAC_LONG"]]
@@ -295,20 +330,24 @@ def mapper(df):
     # Show the map
     return m
 
-#####################
-# write_dataset( df, base, type, state, region ):
-#    
-# Write a file of the DataFrame passed in.
-#
-# Parameters:  
-#    df -- The DataFrame to write.
-#    base -- The base name of the file to write.
-#    type -- The region type of the data.
-#    state -- The state (or None).
-#    region -- The region identifier, e.g. CD number, County, Zip code.
-#
-#####################
+
 def write_dataset( df, base, type, state, region ):
+    '''
+    Write out a file of the Dataframe passed in.
+
+    Parameters
+    ----------
+    df : Dataframe
+        The data to write.
+    base: str
+        A base string of the file to write
+    type: str
+        The region type of the data
+    state: str
+        The state, or None
+    region: str
+        The region identifier, e.g. CD number, County, State, Zip code
+    '''
     if ( df is not None and len( df ) > 0 ):
         if ( not os.path.exists( 'CSVs' )):
             os.makedirs( 'CSVs' )
@@ -324,7 +363,36 @@ def write_dataset( df, base, type, state, region ):
     else:
         print( "There is no data to write." )
 
+
 def make_filename( base, type, state, region, filetype='csv' ):
+    '''
+    Make a filename from the parameters and return it.
+    The filename will be in the Output directory relative to
+    the current working directory, and in a sub-directory
+    built out of the state and CD.
+
+    Parameters
+    ----------
+    base : str
+        A base string of the file
+    type : str
+        The region type
+    state : str
+        The state or None
+    region : str
+        The region
+    filetype : str
+        Optional file suffix.
+
+    Returns
+    -------
+    str
+        The filename created.
+
+    Examples
+    --------
+    >>> filename = make_filename( 'noncomp_CWA_pg6', *df_type )
+    '''
     # If type is 'State', the state name is the region.
     dir = 'Output/'
     if ( type == 'State' ):
@@ -343,7 +411,39 @@ def make_filename( base, type, state, region, filetype='csv' ):
         os.makedirs( dir )
     return dir + filename
 
+
 def get_top_violators( df_active, flag, state, cd, noncomp_field, action_field, num_fac=10 ):
+    '''
+    Sort the dataframe and return the rows that have the most number of
+    non-compliant quarters.
+
+    Parameters
+    ----------
+    df_active : Dataframe
+        Must have ECHO_EXPORTER fields
+    flag : str
+        Identifies the EPA programs of the facility (AIR_FLAG, NPDES_FLAG, etc.)
+    state : str
+        The state
+    cd : str
+        The congressional district    
+    noncomp_field : str
+        The field with the non-compliance values, 'S' or 'V'.
+    action_field
+        The field with the count of quarters with formal actions
+    num_fac
+        The number of facilities to include in the returned Dataframe
+
+    Returns
+    -------
+    Dataframe
+        The top num_fac violators for the EPA program in the region
+
+    Examples
+    --------
+    >>> df_violators = get_top_violators( df_active, 'AIR_FLAG', state, region_selected, 
+        'CAA_3YR_COMPL_QTRS_HISTORY', 'CAA_FORMAL_ACTION_COUNT', 20 )
+    '''
     df_active = df_active.loc[ df_active[flag] == 'Y'].copy()
     noncomp = df_active[ noncomp_field ]
     noncomp_count = noncomp.str.count('S') + noncomp.str.count('V')
@@ -356,6 +456,25 @@ def get_top_violators( df_active, flag, state, cd, noncomp_field, action_field, 
     return df_active   
 
 def chart_top_violators( ranked, state, cd, epa_pgm ):
+    '''
+    Draw a horizontal bar chart of the top non-compliant facilities.
+
+    Parameters
+    ----------
+    ranked : Dataframe
+        The facilities to be charted
+    state : str
+        The state
+    cd : integer
+        The Congressional District
+    epa_pgm : str
+        The EPA program associated with this list of non-compliant facilities
+
+    Returns
+    -------
+    seaborn.barplot
+        The graph that is generated
+    '''
     sns.set(style='whitegrid')
     fig, ax = plt.subplots(figsize=(20,10))
     unit = ranked.index 
