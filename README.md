@@ -2,57 +2,14 @@
 
 # ECHO-Cross-Programs
 This repository contains Jupyter notebooks for ECHO that use data from multiple
-EPA programs. This notebook lets viewers examine facilities closely by state, county, congressional district, or zip code, and collects the program-specific data for all the facilities in the region. The Jupyter Notebook is equipped to look at emissions, violations, inspections, and enforcement for the Clean Air Act, Clean Water Act, and Resouce Conservation and Recovery Act.
+EPA programs. These notebooks let viewers examine facilities by state, county, congressional district, or zip code, and collect the program-specific data for all the facilities in the region. The notebooks look at emissions, violations, inspections, and enforcement for the Clean Air Act, Clean Water Act, and Resouce Conservation and Recovery Act.
 
-- Link to the AllPrograms notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/AllPrograms.ipynb
-- Link to the Cross-Programs notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO-Cross-Programs.ipynb
-- Link to the ECHO National notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO_National.ipynb
+- The AllPrograms notebook gathers data for specified Congressional Districts and States and outputs CSV files used in the creation of congressional report cards.  A link to the notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/AllPrograms.ipynb.
+- The ECHO_National notebook produces data on national metrics, also used in the creation of congressional report cards.  On Google Colab it is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO_National.ipynb
+- The ECHO-Cross-Program notebook lets the user select a geographic region--state, Congressional District, county or zip code--and then view data from the various EPA programs for facilities in the region.  A link to the notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO-Cross-Programs.ipynb
 
-
----
-
-## Notebook validation
-**Basic function**
-- [ ] Does it run all the way through as a Colab notebook when you are signed in as someone with no special EDGI access?
-- [ ] Does it create the outputs it is supposed to create (graphs, data exports, etc.)?
-- [ ] Does it run smoothly when 10+ people are on at the same time?
-
-**Usability**
-- [ ] Are the instructions sensible to a non-coder?
-- [ ] Have code blocks been streamlined as much as possible (combined where they could be)?
-
-**Completeness & accuracy**
-- [ ] Do all code blocks do what comments and text say it will do?
-- [ ] Is the data used appropriate to the questions being asked?
-- [ ] Have we spot checked 3 specific facility reports against the online ECHO data?
-- [ ] Provenance: does the notebook indicate the time/date of the data download? 
-
-**Contextualization**
-- [ ] Are there any abbreviations or technical references that would leave a non-expert confused?
-- [ ] Is it clear where the data is coming from, what the timeline is, where the data may be lacking?
-
-**Impartiality**
-- [ ] Does the language used make sense across all of the parameters the notebook might use (different districts, months, etc. depending on notebook)?
-- [ ] Is the language impartial (not opinionated)?
-- [ ] Are all context references factual and cited?
-
-**Figure completeness**
-- [ ] Does every figure have a title, legend, and labels on x and y axes?
-
-**Figure accuracy**
-- [ ] Are all labels, titles, and legend items accurate to what is being displayed?
-- [ ] If this notebook is run across widely varied parameters, can the figures from different runs be directly compared without being misleading? (Look out for e.g. auto-scaling, inadequate labeling)
-
-**Figure elegance**
-- [ ] Are figures and figure elements appropriately sized for legibility?
-- [ ] Are scales interpretable?**
-- [ ] Do figures compellingly display the answer to a question the notebook asks?
-
-**EDGI and EEW branding**
-- [ ] Is the EEW logo included at the top of the notebook?
-- [ ] Do figures use EDGI brand colors where appropriate?
-
----
+## Report Cards
+The report cards that are based on the data collected by the AllPrograms and ECHO_National notebooks can be seen on the EEW website at this link:  https://environmentalenforcementwatch.org/reports
 
 ## License & Copyright
 
