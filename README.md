@@ -6,7 +6,8 @@ EPA programs. These notebooks let viewers examine facilities by state, county, c
 
 - The AllPrograms notebook gathers data for specified Congressional Districts and States and outputs CSV files used in the creation of congressional report cards.  A link to the notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/AllPrograms.ipynb.
 - The ECHO_National notebook produces data on national metrics, also used in the creation of congressional report cards.  On Google Colab it is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO_National.ipynb
-- The ECHO-Cross-Program notebook lets the user select a geographic region--state, Congressional District, county or zip code--and then view data from the various EPA programs for facilities in the region.  A link to the notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO-Cross-Programs.ipynb
+
+- The ECHO-Cross-Program notebook is the more user-interactive notebook for investigating ECHO data.  It lets the user select a geographic region--state, Congressional District, county or zip code--and then view data from the various EPA programs for facilities in the region.  A link to the notebook on Google Colab is here: https://colab.research.google.com/github/edgi-govdata-archiving/ECHO-Cross-Program/blob/master/ECHO-Cross-Programs.ipynb
 
 ## Report Cards
 The report cards that are based on the data collected by the AllPrograms and ECHO_National notebooks can be seen on the EEW website at this link:  https://environmentalenforcementwatch.org/reports
