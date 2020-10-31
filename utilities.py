@@ -263,13 +263,16 @@ def get_active_facilities( state, region_type, region_selected ):
     return df_active
 
 
-def marker_text( row ):
+def marker_text( row, no_text ):
     '''
     Create a string with information about the facility or program instance.
 
     Parameters
     ----------
-    row : Dataframe row 
+    row : Series
+        Expected to contain FAC_NAME and DFR_URL fields from ECHO_EXPORTER
+    no_text : Boolean
+        If True, don't put any text with the markers, which reduces chance of errors 
 
     Returns
     -------
@@ -278,6 +281,8 @@ def marker_text( row ):
     '''
 
     text = ""
+    if ( no_text ):
+        return text
     if ( type( row['FAC_NAME'] == str )) :
         try:
             text = row["FAC_NAME"] + ' - '
@@ -288,7 +293,30 @@ def marker_text( row ):
     return text
 
 
-def mapper(df):
+def check_bounds( row, bounds ):
+    '''
+    See if the FAC_LAT and FAC_LONG of the row are interior to
+    the minx, miny, maxx, maxy of the bounds.
+
+    Parameters
+    ----------
+    row : Series
+	Must contain FAC_LAT and FAC_LONG
+    bounds : Dataframe
+	Bounding rectangle--minx,miny,maxx,maxy
+
+    Returns
+    -------
+    True if the row's point is in the bounds
+    '''
+
+    if ( row['FAC_LONG'] < bounds.minx[0] or row['FAC_LAT'] < bounds.miny[0] \
+         or row['FAC_LONG'] > bounds.maxx[0] or row['FAC_LAT'] > bounds.maxy[0]):
+        return False
+    return True
+
+
+def mapper(df, bounds=None, no_text=False):
     '''
     Display a map of the Dataframe passed in.
     Based on https://medium.com/@bobhaffner/folium-markerclusters-and-fastmarkerclusters-1e03b01cb7b1
@@ -296,6 +324,9 @@ def mapper(df):
     Parameters
     ----------
     df : Dataframe
+        The facilities to map.  They must have a FAC_LAT and FAC_LONG field.
+    bounds : Dataframe
+        A bounding rectangle--minx, miny, maxx, maxy.  Discard points outside.
 
     Returns
     -------
@@ -313,9 +344,12 @@ def mapper(df):
  
     # Add a clickable marker for each facility
     for index, row in df.iterrows():
+        if ( bounds is not None ):
+            if ( not check_bounds( row, bounds )):
+                continue
         mc.add_child(folium.CircleMarker(
             location = [row["FAC_LAT"], row["FAC_LONG"]],
-            popup = marker_text( row ),
+            popup = marker_text( row, no_text ),
             radius = 8,
             color = "black",
             weight = 1,
@@ -444,7 +478,10 @@ def get_top_violators( df_active, flag, state, cd, noncomp_field, action_field, 
     >>> df_violators = get_top_violators( df_active, 'AIR_FLAG', state, region_selected, 
         'CAA_3YR_COMPL_QTRS_HISTORY', 'CAA_FORMAL_ACTION_COUNT', 20 )
     '''
-    df_active = df_active.loc[ df_active[flag] == 'Y'].copy()
+    df = df_active.loc[ df_active[flag] == 'Y' ]
+    if ( len( df ) == 0 ):
+        return None
+    df_active = df.copy()
     noncomp = df_active[ noncomp_field ]
     noncomp_count = noncomp.str.count('S') + noncomp.str.count('V')
     df_active['noncomp_count'] = noncomp_count
