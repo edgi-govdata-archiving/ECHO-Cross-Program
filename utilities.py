@@ -349,7 +349,7 @@ def mapper(df, bounds=None, no_text=False):
                 continue
         mc.add_child(folium.CircleMarker(
             location = [row["FAC_LAT"], row["FAC_LONG"]],
-            popup = marker_text( row, no_text ),
+            #popup = marker_text( row, no_text ),
             radius = 8,
             color = "black",
             weight = 1,
