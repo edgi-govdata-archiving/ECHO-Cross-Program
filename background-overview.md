@@ -1,9 +1,9 @@
-## Environmental Data Governance Initiative (EDGI)
-## Environmental Enforcement Watch (EEW) - a project of EDGI
+## [Environmental Data Governance Initiative (EDGI)](https://envirodatagov.org/)
+## [Environmental Enforcement Watch (EEW)](https://environmentalenforcementwatch.org/) - a project of EDGI
 
 ### What is this about?
 
-We start with EPA data on permits, inspections, violations, enforcement actions.  This data is collected and made public in an EPA system called the Enforcement Compliance History Online (ECHO).  In the Data Services tab of this site the National Data Sets contain numerous CSV files of data, dating back to the 1980s in many cases.  Each data set has its own set of fields, whose meanings are defined in separate pages.
+We start with EPA data on permits, inspections, violations, enforcement actions.  This data is collected and made public in an EPA system called the [Enforcement Compliance History Online (ECHO)](https://echo.epa.gov/).  In the Data Services tab of this site the National Data Sets contain numerous CSV files of data, dating back to the 1980s in many cases.  Each data set has its own set of fields, whose meanings are defined in separate pages.
 
 Working with database experts at Stony Brook University in New York, EEW defined database schema to allow us to load the CSV files into a PostgreSQL database to facilitate searching and analyzing the data.  An automated process for this was developed for many of the key data sets within ECHO.  The database is read-only.
 
