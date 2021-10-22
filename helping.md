@@ -19,8 +19,8 @@ Because of the close relationship between the *ECHO-Cross-Program* and *ECHO_mod
    * git add ECHO-Cross-Program.ipynb   *or the file or files you have changed*
    * git commit -m "A brief message about the change, including the issue #11"
    * git push origin steves-branch-#11
-10. You can repeat step 9 multiple times as you are working on the issue.  When you believe you have a solution that should be incorporated into the main branch.
-   * Go to the repository's [Github page](https://https://github.com/edgi-govdata-archiving/ECHO-Cross-Program).  Or perhaps your change is in [ECHO_modules](https://github.com/edgi-govdata-archiving/ECHO_modules).
-   * Look for your branch under the list of *branches*.
-   * Click on the *New Pull Request* button for your branch.  Add some description of the change.
-   * We will review and test your change. If all goes well, we'll merge it into the *main* branch of the repository.
+10. You can repeat step 9 multiple times as you are working on the issue.  When you believe you have a solution that should be incorporated into the main branch:
+    * Go to the repository's [Github page](https://https://github.com/edgi-govdata-archiving/ECHO-Cross-Program).  Or perhaps your change is in [ECHO_modules](https://github.com/edgi-govdata-archiving/ECHO_modules).
+    * Look for your branch under the list of *branches*.
+    * Click on the *New Pull Request* button for your branch.  Add some description of the change.
+    * We will review and test your change. If all goes well, we'll merge it into the *main* branch of the repository.
