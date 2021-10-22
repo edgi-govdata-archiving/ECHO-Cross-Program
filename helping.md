@@ -4,7 +4,7 @@ Because of the close relationship between the *ECHO-Cross-Program* and *ECHO_mod
 
 1. Read through the Issues and choose one you would like to work on.
 2. Ask questions for clarification by adding a comment to the issue.
-3. Create a branch with a descriptive name, including the issue number, e.g. #11, in the name.  It could be *steves-branch #11*.
+3. Create a branch with a descriptive name, including the issue number, e.g. #11, in the name.  It could be *steves-branch-#11*.
 4. If you find you need to also make a change in *ECHO_modules*, create a branch in that repository with the same name.
 5. Clone the repository to your system, using the Code button on the repository's home page.
 6. Change your local copy of the repository to the branch you created.  (On the command line you can see what branch you are on by the 'git status' command.  The command 'git checkout mybranch' will switch to the mybranch branch.)
@@ -18,4 +18,9 @@ Because of the close relationship between the *ECHO-Cross-Program* and *ECHO_mod
 9. To commit your code to your branch in the respository, do these steps. (These are the steps using Github's command line.)
    * git add ECHO-Cross-Program.ipynb   *or the file or files you have changed*
    * git commit -m "A brief message about the change, including the issue #11"
-   * git push origin steves-branch #11
+   * git push origin steves-branch-#11
+10. You can repeat step 9 multiple times as you are working on the issue.  When you believe you have a solution that should be incorporated into the main branch.
+   * Go to the repository's [Github page](https://https://github.com/edgi-govdata-archiving/ECHO-Cross-Program).  Or perhaps your change is in [ECHO_modules](https://github.com/edgi-govdata-archiving/ECHO_modules).
+   * Look for your branch under the list of *branches*.
+   * Click on the *New Pull Request* button for your branch.  Add some description of the change.
+   * We will review and test your change. If all goes well, we'll merge it into the *main* branch of the repository.
