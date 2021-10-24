@@ -15,6 +15,8 @@ The notebooks in this repository rely on code in the [ECHO_modules repository](h
 
 #### [Here are suggestions for how you can help us with issues in this repository.](https://github.com/edgi-govdata-archiving/ECHO-Cross-Program/blob/main/helping.md)
 
+#### [How the Stony Brook University database is structured and used can be found here.](https://github.com/edgi-govdata-archiving/ECHO_modules/blob/main/SBU-db.md)
+
 ## License & Copyright
 
 Copyright (C) <year> Environmental Data and Governance Initiative (EDGI)
